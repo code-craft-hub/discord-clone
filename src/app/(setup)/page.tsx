@@ -1,3 +1,4 @@
+import { InitialModal } from "@/components/modals/initial-modal";
 import { db } from "@/lib/db";
 import { initialProfile } from "@/lib/initial-profile";
 import { redirect } from "next/navigation";
@@ -17,7 +18,8 @@ const SetupPage = async () => {
 
   if (server) redirect(`/servers/${server.id}`);
 
-  return <div>{JSON.stringify(profile, null, 2)}</div>;
+  return <InitialModal />
+  // return <div>{JSON.stringify(profile, null, 2)}</div>;
 };
 
 export default SetupPage;
