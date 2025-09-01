@@ -6,18 +6,20 @@ import React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, LogOut, PlusCircle, Trash, UserPlus, Users } from "lucide-react";
+import {
+  ChevronDown,
+  LogOut,
+  PlusCircle,
+  Settings,
+  Trash,
+  UserPlus,
+  Users,
+} from "lucide-react";
+import { useModal } from "@/hooks/use-modal-store";
 
 type Props = {
   server: ServerWithMembersWithProfiles;
@@ -25,6 +27,8 @@ type Props = {
 };
 
 export const ServerHeader = ({ server, role }: Props) => {
+  const { onOpen } = useModal();
+
   const isAdmin = role === MemberRole.ADMIN;
   const isModerator = isAdmin || role === MemberRole.MODERATOR;
 
@@ -39,19 +43,29 @@ export const ServerHeader = ({ server, role }: Props) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56 text-xs font-medium text-black dark:text-neutral-400 space-y-[2px] ">
           {isModerator && (
-            <DropdownMenuItem className="text-indigo-600 dark:text-indigo-400 px-3 py-2 text-sm cursor-pointer">
+            <DropdownMenuItem
+              // TODO: server data is passed here into the global state, how are they distinguished?
+              onClick={() => onOpen("invite", { server })}
+              className="text-indigo-600 dark:text-indigo-400 px-3 py-2 text-sm cursor-pointer"
+            >
               Invite People
               <UserPlus className="size-4 ml-auto" />
             </DropdownMenuItem>
           )}
           {isAdmin && (
-            <DropdownMenuItem className="px-3 py-2 text-sm cursor-pointer">
+            <DropdownMenuItem
+              className="px-3 py-2 text-sm cursor-pointer"
+              onClick={() => onOpen("editServer", { server })}
+            >
               Server Settings
-              <ChevronDown className="size-4 ml-auto" />
+              <Settings className="size-4 ml-auto" />
             </DropdownMenuItem>
           )}
           {isAdmin && (
-            <DropdownMenuItem className="px-3 py-2 text-sm cursor-pointer">
+            <DropdownMenuItem
+              className="px-3 py-2 text-sm cursor-pointer"
+              onClick={() => onOpen("members", { server })}
+            >
               Manage Members
               <Users className="size-4 ml-auto" />
             </DropdownMenuItem>
