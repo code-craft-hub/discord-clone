@@ -99,7 +99,7 @@ export const CreateChannelModal = () => {
       <DialogContent className="p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Create Dialog
+            Create Channel
           </DialogTitle>
           <DialogDescription className="text-center">
             Give your server a personality with a name and an image. You can
