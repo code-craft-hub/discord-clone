@@ -1,23 +1,21 @@
 import { currentProfile } from "@/lib/current-profile";
-import React from "react";
-import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { ServerSidebar } from "@/components/server/server-sidebar";
 
 type Props = {
-  children: React.ReactNode;
-  params: Promise<{ serverId: string }>;
+  params: Promise<{
+    serverId: string;
+  }>;
 };
 
-const ServerIdPage = async ({ children, params }: Props) => {
+const ServerIdPage = async ({ params }: Props) => {
   const profile = await currentProfile();
   const { redirectToSignIn } = await auth();
-
-  if (!profile) return redirectToSignIn();
-
-    const { serverId } = await params;
-
+  const { serverId } = await params;
+  if (!profile) {
+    return redirectToSignIn();
+  }
 
   const server = await db.server.findUnique({
     where: {
@@ -28,17 +26,22 @@ const ServerIdPage = async ({ children, params }: Props) => {
         },
       },
     },
+    include: {
+      channels: {
+        where: {
+          name: "general",
+        },
+      },
+    },
   });
+  console.log(server);
 
-  if (!server) return redirect("/");
-  return (
-    <div className="h-full">
-      <div className="fixed hidden md:flex h-full w-60 z-20 flex-col inset-y-0">
-        <ServerSidebar serverId={serverId} />
-      </div>
-      <main className="h-full md:pl-60">{children}</main>
-    </div>
-  );
+  const initialChannel = server?.channels[0];
+  if (initialChannel?.name !== "general") {
+    return null;
+  }
+
+  return redirect(`/servers/${serverId}/channels/${initialChannel?.id}`);
 };
 
 export default ServerIdPage;

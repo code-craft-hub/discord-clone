@@ -27,7 +27,6 @@ export const ServerChannel = ({ channel, role, server }: Props) => {
   const router = useRouter();
 
   const onClick = () => {
-    console.log("channel clicked : ", channel)
     router.push(`/servers/${params?.serverId}/channels/${channel.id}`);
   };
 
