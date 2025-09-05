@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { channelId: string } }
+  { params }: { params: Promise<{ channelId: string }> }
 ) {
   try {
     const profile = await currentProfile();
@@ -13,12 +13,14 @@ export async function DELETE(
 
     const serverId = searchParams.get("serverId");
 
+    const {channelId} = await params;
+
     if (!profile) return new NextResponse("Unauthorized", { status: 401 });
 
     if (!serverId)
       return new NextResponse("Server ID missing", { status: 400 });
 
-    if (!params.channelId)
+    if (!channelId)
       return new NextResponse("Channel ID missing", { status: 400 });
 
     const server = await db.server.update({
@@ -36,7 +38,7 @@ export async function DELETE(
       data: {
         channels: {
           delete: {
-            id: params.channelId,
+            id: channelId,
             name: {
               not: "general",
             },
@@ -54,12 +56,13 @@ export async function DELETE(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { channelId: string } }
+  { params }: { params: Promise<{ channelId: string }> }
 ) {
   try {
     const profile = await currentProfile();
     const { searchParams } = new URL(req.url);
     const { name, type } = await req.json();
+    const { channelId } = await params;
 
     const serverId = searchParams.get("serverId");
 
@@ -68,7 +71,7 @@ export async function PATCH(
     if (!serverId)
       return new NextResponse("Server ID missing", { status: 400 });
 
-    if (!params.channelId)
+    if (!channelId)
       return new NextResponse("Channel ID missing", { status: 400 });
     if (name === "general")
       return new NextResponse("Name can't be 'general'", { status: 400 });
@@ -89,7 +92,7 @@ export async function PATCH(
         channels: {
           update: {
             where: {
-              id: params.channelId,
+              id: channelId,
               NOT: {
                 name: "general",
               },

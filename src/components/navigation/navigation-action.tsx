@@ -4,9 +4,8 @@ import React from "react";
 import { ActionTooltip } from "../action-tooltip";
 import { useModal } from "@/hooks/use-modal-store";
 
-type Props = {};
 
-export const NavigationAction = (props: Props) => {
+export const NavigationAction = () => {
   const { onOpen } = useModal();
   return (
     <div>

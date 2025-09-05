@@ -4,12 +4,14 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { memberId: string } }
+  { params }: { params: Promise<{ memberId: string }> }
 ) {
   try {
     const profile = await currentProfile();
     const { searchParams } = new URL(req.url);
     const serverId = searchParams.get("serverId");
+
+    const {memberId} = await params;
 
     if (!profile) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -17,7 +19,7 @@ export async function DELETE(
     if (!serverId) {
       return new NextResponse("Server ID missing", { status: 401 });
     }
-    if (!params.memberId) {
+    if (!memberId) {
       return new NextResponse("Member ID missing", { status: 401 });
     }
 
@@ -29,7 +31,7 @@ export async function DELETE(
       data: {
         members: {
           deleteMany: {
-            id: params.memberId,
+            id: memberId ,
             profileId: {
               not: profile.id,
             },
@@ -57,13 +59,14 @@ export async function DELETE(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { memberId: string } }
+  { params }: { params: Promise<{ memberId: string }> }
 ) {
   try {
     const profile = await currentProfile();
 
     const { searchParams } = new URL(req.url);
     const { role } = await req.json();
+    const {memberId} = await params;
 
     const serverId = searchParams.get("serverId");
 
@@ -73,7 +76,7 @@ export async function PATCH(
     if (!serverId) {
       return new NextResponse("Server ID missing", { status: 400 });
     }
-    if (!params.memberId) {
+    if (!memberId) {
       return new NextResponse("Member ID missing", { status: 400 });
     }
 
@@ -86,7 +89,7 @@ export async function PATCH(
         members: {
           update: {
             where: {
-              id: params.memberId,
+              id: memberId,
               profileId: {
                 not: profile.id,
               },
@@ -107,20 +110,6 @@ export async function PATCH(
       },
     });
 
-    // console.log(
-    //   "req.url : ",
-    //   req.url,
-    //   "searchParams : ",
-    //   searchParams,
-    //   "role : ",
-    //   role,
-    //   "serverId : ",
-    //   serverId,
-    //   "params : ",
-    //   params,
-    //   "server : ",
-    //   server
-    // );
     return NextResponse.json(server);
   } catch (error) {
     console.error("[MEMBERS_ID_PATCH", error);
